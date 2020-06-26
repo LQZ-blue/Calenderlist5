@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private CalendarView calendarView;
     private EditText scheduleInput;
     private Context context;
-    private Button addSchedule,checkAdd;
+    private Button addSchedule,checkAdd,lookfor;
     private String dateToday;//用于记录今天的日期
     private MySQLiteOpenHelper mySQLiteOpenHelper;
     private SQLiteDatabase myDatabase;
@@ -54,6 +54,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         addSchedule.setOnClickListener(this);       //添加日程
         checkAdd = findViewById(R.id.checkAdd);
         checkAdd.setOnClickListener(this);      //确认添加日程
+        lookfor = findViewById(R.id.look);
+        lookfor.setOnClickListener(this);       //查询信息，不可操作
+
 
         calendarView = findViewById(R.id.calendar);
         scheduleInput = findViewById(R.id.scheduleDetailInput);
@@ -121,6 +124,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.schedule1:case R.id.schedule2:case R.id.schedule3:case R.id.schedule4:case R.id.schedule5:
                 editSchedule(v);        //修改事件，计划修改成备忘录
                 break;
+            case R.id.look:     //查询别人的事件
+                enterDetail();
         }
     }
 
@@ -128,10 +133,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Intent intent = new Intent(MainActivity.this, EditScheduleActivity2.class);
         String sch = ((TextView) v).getText().toString().split("：")[1];
         Cursor cursor = myDatabase.query("schedules", new String[]{"events"},"scheduleDetail="+"'"+sch+"'",null,null,null,null);
-        //System.out.println("瓜瓜哥哥哥哥");
         if(cursor.moveToFirst()) {
             String aScheduleDetail2 = cursor.getString(cursor.getColumnIndex("events"));
-            System.out.println("这就是传说中的备忘录"+aScheduleDetail2);
             intent.putExtra("events",aScheduleDetail2);
         }
         intent.putExtra("schedule",sch);
@@ -154,5 +157,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void addMySchedule() {
         scheduleInput.setVisibility(View.VISIBLE);
         checkAdd.setVisibility(View.VISIBLE);
+    }
+
+    private void enterDetail(){
+        Intent intent = new Intent(MainActivity.this, DetailActivity.class);
+        intent.putExtra("date",dateToday);
+        startActivity(intent);
     }
 }
